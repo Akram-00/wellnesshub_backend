@@ -7,7 +7,6 @@ const adminTokenHandler = require('../Middlewares/checkAdminToken');
 
 const jwt = require('jsonwebtoken');
 
-
 function createResponse(ok, message, data) {
     return {
         ok,
@@ -61,8 +60,9 @@ router.post('/login', async (req, res, next) => {
         }
 
         // Generate an authentication token for the admin
-        const adminAuthToken = jwt.sign({ adminId: admin._id }, process.env.JWT_ADMIN_SECRET_KEY, { expiresIn: '10m' });
 
+        const adminAuthToken = jwt.sign({ adminId: admin._id }, process.env.JWT_ADMIN_SECRET_KEY, { expiresIn: '10m' });
+        
         res.cookie('adminAuthToken', adminAuthToken, { httpOnly: true });
         res.status(200).json(createResponse(true, 'Admin login successful', { adminAuthToken }));
     } catch (err) {

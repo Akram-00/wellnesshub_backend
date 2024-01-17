@@ -23,7 +23,7 @@ require('dotenv').config();
 require('./db');
 
 app.use(bodyParser.json());
-app.allowedOrigins = ['http://localhost:3000']; // front-end url
+const allowedOrigins = ['http://localhost:3000']; // front-end url
 // cors policy only allows those who only have accesss
 app.use(
     cors({

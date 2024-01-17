@@ -49,8 +49,6 @@ router.post('/getstepsbydate', authTokenHandler, async (req, res) => {
     res.json(createResponse(true, 'Steps entries for the date', user.steps));
 });
 
-
-
 router.post('/getstepsbylimit', authTokenHandler, async (req, res) => {
     const { limit } = req.body;
 
@@ -90,8 +88,6 @@ router.delete('/deletestepentry', authTokenHandler, async (req, res) => {
     await user.save();
     res.json(createResponse(true, 'Steps entry deleted successfully'));
 });
-
-
 
 router.get('/getusergoalsteps', authTokenHandler, async (req, res) => {
     const userId = req.userId;
