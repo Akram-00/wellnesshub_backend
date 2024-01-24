@@ -24,7 +24,7 @@ router.get('/test', authTokenHandler, async (req, res) => {
 router.post('/addcalorieintake', authTokenHandler, async (req, res) => {
     const { item, date, quantity, quantitytype } = req.body;
     if (!item || !date || !quantity || !quantitytype) {
-        return res.status(400).json(createResponse(false, 'Please provide all the details'));
+        return res.status(400).json(createResponse(false, 'Please provide all the details', req.body));
     }
     let qtyingrams = 0;
     if (quantitytype === 'g') {
@@ -91,7 +91,7 @@ router.post('/getcalorieintakebydate', authTokenHandler, async (req, res) => {
     const userId = req.userId;
     const user = await User.findById({ _id: userId });
     if (!date) {
-        let date = new Date();   
+        let date = new Date();
         user.calorieIntake = filterEntriesByDate(user.calorieIntake, date);
 
         return res.json(createResponse(true, 'Calorie intake for today', user.calorieIntake));
@@ -103,7 +103,7 @@ router.post('/getcalorieintakebydate', authTokenHandler, async (req, res) => {
 router.post('/getcalorieintakebylimit', authTokenHandler, async (req, res) => {
     const { limit } = req.body;
     const userId = req.userId;
-    const user = await User.findById({ _id: userId }); 
+    const user = await User.findById({ _id: userId });
     if (!limit) {
         return res.status(400).json(createResponse(false, 'Please provide limit'));
     } else if (limit === 'all') {
@@ -136,7 +136,7 @@ router.delete('/deletecalorieintake', authTokenHandler, async (req, res) => {
     const user = await User.findById({ _id: userId });
 
     user.calorieIntake = user.calorieIntake.filter((item) => {
-        return item.item != item && item.date != date;
+        return item.item !== item && item.date.toString() !== new Date(date).toString();
     })
     await user.save();
     res.json(createResponse(true, 'Calorie intake deleted successfully'));
