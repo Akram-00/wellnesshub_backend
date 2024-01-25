@@ -16,7 +16,7 @@ function createResponse(ok, message, data) {
 router.post('/addsleepentry', authTokenHandler, async (req, res) => {
     const { date, durationInHrs } = req.body;
 
-    if (!date || !duration) {
+    if (!date || !durationInHrs) {
         return res.status(400).json(createResponse(false, 'Please provide date and sleep duration'));
     }
 
