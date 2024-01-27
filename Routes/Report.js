@@ -37,7 +37,7 @@ router.get('/getreport', authTokenHandler, async (req, res) => {
     // get today's sleep
     let sleep = 0;
     user.sleep.forEach((entry) => {
-        if (entry.date.getDate() === today.getDate() && entry.date.getMonth() === today.getMonth() && entry.date.getFullYear() === today.getFullYear()) {
+        if (entry.date.getDate() === today.getDate() - 1 && entry.date.getMonth() === today.getMonth() && entry.date.getFullYear() === today.getFullYear()) {
             sleep += entry.durationInHrs;
         }
     });
