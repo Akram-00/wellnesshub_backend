@@ -123,6 +123,14 @@ router.post('/checklogin', authTokenHandler, async (req, res, next) => {
         message: 'User authenticated successfully'
     })
 })
+router.post('/logout', authTokenHandler, (req, res) => {
+    // Clear cookies to "logout" the user
+    res.clearCookie('authToken');
+    res.clearCookie('refreshToken');
+
+    res.status(200).json({ message: 'Logout successful', ok: true });
+});
+
 router.use(errorHandler)
 
 module.exports = router
