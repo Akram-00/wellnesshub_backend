@@ -118,9 +118,11 @@ router.post('/sendotp', async (req, res, next) => {
     }
 })
 router.post('/checklogin', authTokenHandler, async (req, res, next) => {
+    const userId = req.userId;
     res.json({
         ok: true,
-        message: 'User authenticated successfully'
+        message: 'User authenticated successfully',
+        userid: userId
     })
 })
 router.post('/logout', authTokenHandler, (req, res) => {
