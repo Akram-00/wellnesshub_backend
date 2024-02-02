@@ -125,6 +125,31 @@ router.post('/checklogin', authTokenHandler, async (req, res, next) => {
         userid: userId
     })
 })
+
+router.post('/getuserdata', authTokenHandler, async (req, res, Fnext) => {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+
+    if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+    }
+
+    const userDetails = {
+        name: user.name,
+        email: user.email,
+        weight: user.weight,
+        height: user.height,
+        gender: user.gender,
+        dob: user.dob,
+        goal: user.goal,
+        workouts: user.workouts,
+        activityLevel: user.activityLevel
+    }
+
+    res.json(createResponse(true, 'UserDetails fetched successfully', userDetails))
+
+})
+
 router.post('/logout', authTokenHandler, (req, res) => {
     // Clear cookies to "logout" the user
     res.clearCookie('authToken');

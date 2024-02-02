@@ -6,8 +6,10 @@ function checkAuth(req, res, next) {
 
     // console.log("Check Auth Token MIDDLEWARE CALLED", authToken)
 
-    if (!authToken || !refreshToken) {
-        return res.status(401).json({ message: 'Authentication failed: No authToken or refreshToken provided', ok: false });
+    if (!authToken) {
+        if (!refreshToken){
+            return res.status(401).json({ message: 'Authentication failed: No authToken or refreshToken provided', ok: false });
+        }
     }
 
     jwt.verify(authToken, process.env.JWT_SECRET_KEY, (err, decoded) => {
