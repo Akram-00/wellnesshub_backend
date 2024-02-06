@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    userImageURL:{
+        type:String,
+    },
     weight: [
         {
             weight: {
