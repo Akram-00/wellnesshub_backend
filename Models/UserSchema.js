@@ -10,13 +10,21 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    otp: {
+        value: {
+            type: String,
+        },
+        expiry: {
+            type: Date,
+        },
+    },
     password: {
         type: String,
         required: true,
         unique: true,
     },
-    userImageURL:{
-        type:String,
+    userImageURL: {
+        type: String,
     },
     weight: [
         {
@@ -42,13 +50,13 @@ const userSchema = new mongoose.Schema({
             }
         }
     ],
-    gender:{
-        type:String,
-        required:true,
+    gender: {
+        type: String,
+        required: true,
     },
-    dob:{
-        type:String,
-        required:true,
+    dob: {
+        type: String,
+        required: true,
     },
     goal: {
         type: String,

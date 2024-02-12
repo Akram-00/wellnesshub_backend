@@ -96,27 +96,65 @@ router.post('/login', async (req, res, next) => {
 router.post('/sendotp', async (req, res, next) => {
     try {
         const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
         const otp = Math.floor(100000 + Math.random() * 900000);
+
+        // Set OTP value and expiration
+        const otpExpiry = new Date();
+        otpExpiry.setMinutes(otpExpiry.getMinutes() + 15); // Expiry set to 15 minutes
+        user.otp = { value: otp, expiry: otpExpiry };
+        await user.save();
 
         const mailOptions = {
             from: 'akramtest0000@gmail.com',
             to: email,
-            subject: 'OTP for verification',
-            text: `Your OTP is ${otp}`
-        }
+            subject: 'OTP for password reset',
+            text: `Your OTP for password reset is ${otp}`
+        };
 
         transporter.sendMail(mailOptions, async (err, info) => {
             if (err) {
                 console.log(err);
-                res.status(500).json(createResponse(false, err.message));
+                return res.status(500).json({ message: 'Failed to send OTP', error: err });
             } else {
-                res.json(createResponse(true, 'OTP sent successfully', { otp }));
+                res.json({ message: 'OTP sent successfully' });
             }
         });
     } catch (err) {
-        next(err)
+        next(err);
     }
-})
+});
+router.put('/resetpasswordbyotp', authTokenHandler, async (req, res, next) => {
+    try {
+        const { otp, newPassword } = req.body;
+        const userId = req.userId; // Provided by auth middleware
+
+        // Find the user by userId and check OTP validity
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json(createResponse(false, 'User not found'));
+        }
+
+        if (!user.otp || user.otp.value !== otp || user.otp.expiry < new Date()) {
+            return res.status(400).json(createResponse(false, 'Invalid OTP'));
+        }
+
+        // Update password and clear OTP
+        user.password = newPassword;
+        user.otp = undefined;
+        await user.save();
+
+        res.json(createResponse(true, 'Password reset successfully'));
+    } catch (err) {
+        next(err);
+    }
+});
 router.post('/checklogin', authTokenHandler, async (req, res, next) => {
     const userId = req.userId;
     res.json({
