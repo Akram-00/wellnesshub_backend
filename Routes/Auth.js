@@ -125,8 +125,111 @@ router.post('/checklogin', authTokenHandler, async (req, res, next) => {
         userid: userId
     })
 })
+router.put('/changepassword', authTokenHandler, async (req, res, next) => {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.userId;
 
-router.post('/getuserdata', authTokenHandler, async (req, res, Fnext) => {
+    try {
+        // Find the user by userId
+        const user = await User.findById(userId);
+
+        // If user doesn't exist
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Compare oldPassword with the existing password
+        const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+        // If oldPassword is incorrect
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: 'Incorrect old password' });
+        }
+
+        // Hash the new password
+        user.password = newPassword;
+
+        // Save the updated user
+        await user.save();
+
+        // Respond with success message
+        res.status(200).json({ message: 'Password changed successfully' });
+    } catch (error) {
+        // Handle errors
+        next(error);
+    }
+});
+router.delete('/cleardata', authTokenHandler, async (req, res) => {
+    try {
+        const userId = req.userId; // Assuming you're using middleware to extract userId
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Clear user data from calorieIntake to water
+        user.calorieIntake = [];
+        user.sleep = [];
+        user.steps = [];
+        user.workouts = [];
+        user.water = [];
+
+        // Save the updated user
+        await user.save();
+
+        // Respond with success message
+        return res.status(200).json({ message: 'User data cleared successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+router.delete('/deleteuser', authTokenHandler, async (req, res, next) => {
+    try {
+        const userId = req.userId; // Assuming you're using middleware to extract userId
+        const user = await User.findByIdAndDelete(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.status(200).json({ message: 'User account deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
+router.put('/uploadImage', authTokenHandler, async (req, res) => {
+    try {
+        const userId = req.userId; // Extracting userId from middleware
+
+        // Find the user by userId
+        const user = await User.findById(userId);
+
+        // If user doesn't exist
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Extract the link from the request body
+        const { link } = req.body;
+
+        // Update the userImageURL field
+        user.userImageURL = link;
+
+        // Save the updated user
+        await user.save();
+
+        // Respond with success message
+        res.status(200).json({ message: 'User image URL updated successfully' });
+    } catch (error) {
+        // Handle errors
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+router.post('/getuserdata', authTokenHandler, async (req, res, next) => {
     const userId = req.userId;
     const user = await User.findById(userId);
 
