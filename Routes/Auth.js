@@ -73,7 +73,7 @@ router.post('/login', async (req, res, next) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json(createResponse(false, 'Invalid credentials'));
+            return res.status(400).json(createResponse(false, 'User Not Found'));
         }
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
@@ -173,7 +173,7 @@ router.put('/changepassword', authTokenHandler, async (req, res, next) => {
 
         // If user doesn't exist
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json(createResponse(true,"User not Found"));
         }
 
         // Compare oldPassword with the existing password
@@ -181,7 +181,7 @@ router.put('/changepassword', authTokenHandler, async (req, res, next) => {
 
         // If oldPassword is incorrect
         if (!isPasswordValid) {
-            return res.status(400).json({ message: 'Incorrect old password' });
+            return res.status(400).json(createResponse(true, "Incorrect password"));
         }
 
         // Hash the new password
@@ -191,7 +191,7 @@ router.put('/changepassword', authTokenHandler, async (req, res, next) => {
         await user.save();
 
         // Respond with success message
-        res.status(200).json({ message: 'Password changed successfully' });
+        res.status(200).json(createResponse(true, "Password changed successfully"));
     } catch (error) {
         // Handle errors
         next(error);
@@ -203,7 +203,7 @@ router.delete('/cleardata', authTokenHandler, async (req, res) => {
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json(createResponse(false, "User Not Found"));
         }
 
         // Clear user data from calorieIntake to water
@@ -217,10 +217,10 @@ router.delete('/cleardata', authTokenHandler, async (req, res) => {
         await user.save();
 
         // Respond with success message
-        return res.status(200).json({ message: 'User data cleared successfully' });
+        return res.status(200).json(createResponse(true, 'User data cleared successfully'));
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json(createResponse(true, 'Internal server error'));
     }
 });
 router.delete('/deleteuser', authTokenHandler, async (req, res, next) => {
@@ -229,13 +229,13 @@ router.delete('/deleteuser', authTokenHandler, async (req, res, next) => {
         const user = await User.findByIdAndDelete(userId);
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json(createResponse(false,'User not found'));
         }
 
-        return res.status(200).json({ message: 'User account deleted successfully' });
+        return res.status(200).json(createResponse(true,'User account deleted successfully' ));
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json(createResponse(false,'Internal server error'));
     }
 });
 router.put('/uploadImage', authTokenHandler, async (req, res) => {
