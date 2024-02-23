@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'akramtest0000@gmail.com',
-        pass: 'trmcbkktnkudnpim'
+        pass: 'lmmq inva sfdd vueh'
     }
 })
 
@@ -129,13 +129,12 @@ router.post('/sendotp', async (req, res, next) => {
         next(err);
     }
 });
-router.put('/resetpasswordbyotp', authTokenHandler, async (req, res, next) => {
+router.put('/otpverfication', async (req, res, next) => {
     try {
-        const { otp, newPassword } = req.body;
-        const userId = req.userId; // Provided by auth middleware
+        const { email, otp } = req.body;
+        const user = await User.findOne({ email });
 
         // Find the user by userId and check OTP validity
-        const user = await User.findById(userId);
 
         if (!user) {
             return res.status(404).json(createResponse(false, 'User not found'));
@@ -145,23 +144,44 @@ router.put('/resetpasswordbyotp', authTokenHandler, async (req, res, next) => {
             return res.status(400).json(createResponse(false, 'Invalid OTP'));
         }
 
-        // Update password and clear OTP
-        user.password = newPassword;
-        user.otp = undefined;
+        // Clear the OTP value and expiry time
+        user.otp = { value: "", expiry: "" };
+
+        // Save the updated user record
         await user.save();
 
-        res.json(createResponse(true, 'Password reset successfully'));
+        res.json(createResponse(true, 'OTP verification is completed'));
     } catch (err) {
         next(err);
     }
 });
+router.put('/resetpasswordbyotp', async(req,res,next)=>{
+    try {
+        const { email, newPassword } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json(createResponse(false, 'User not found'));
+        }
+        user.password = newPassword;
+        user.otp = undefined;
+        await user.save();
+    
+        res.json(createResponse(true, 'Password reset successfully'));
+    } catch (error) {
+        next(error)
+    }
+})
 router.post('/checklogin', authTokenHandler, async (req, res, next) => {
-    const userId = req.userId;
-    res.json({
-        ok: true,
-        message: 'User authenticated successfully',
-        userid: userId
-    })
+    try {
+        const userId = req.userId;
+        res.json({
+            ok: true,
+            message: 'User authenticated successfully',
+            userid: userId
+        })
+    } catch (error) {
+        next(error)
+    }
 })
 router.put('/changepassword', authTokenHandler, async (req, res, next) => {
     const { oldPassword, newPassword } = req.body;
