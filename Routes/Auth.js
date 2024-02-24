@@ -99,7 +99,7 @@ router.post('/sendotp', async (req, res, next) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json(createResponse(false,'User not found'));
         }
 
         const otp = Math.floor(100000 + Math.random() * 900000);
@@ -120,9 +120,9 @@ router.post('/sendotp', async (req, res, next) => {
         transporter.sendMail(mailOptions, async (err, info) => {
             if (err) {
                 console.log(err);
-                return res.status(500).json({ message: 'Failed to send OTP', error: err });
+                return res.status(500).json(createResponse(false,'Failed to send OTP',err));
             } else {
-                res.json({ message: 'OTP sent successfully' });
+                res.json(createResponse(true,'OTP sent successfully'));
             }
         });
     } catch (err) {
