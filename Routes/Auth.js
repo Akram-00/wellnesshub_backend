@@ -99,7 +99,7 @@ router.post('/sendotp', async (req, res, next) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json(createResponse(false,'User not found'));
+            return res.status(404).json(createResponse(false, 'User not found'));
         }
 
         const otp = Math.floor(100000 + Math.random() * 900000);
@@ -120,9 +120,9 @@ router.post('/sendotp', async (req, res, next) => {
         transporter.sendMail(mailOptions, async (err, info) => {
             if (err) {
                 console.log(err);
-                return res.status(500).json(createResponse(false,'Failed to send OTP',err));
+                return res.status(500).json(createResponse(false, 'Failed to send OTP', err));
             } else {
-                res.json(createResponse(true,'OTP sent successfully'));
+                res.json(createResponse(true, 'OTP sent successfully'));
             }
         });
     } catch (err) {
@@ -155,7 +155,7 @@ router.put('/otpverfication', async (req, res, next) => {
         next(err);
     }
 });
-router.put('/resetpasswordbyotp', async(req,res,next)=>{
+router.put('/resetpasswordbyotp', async (req, res, next) => {
     try {
         const { email, newPassword } = req.body;
         const user = await User.findOne({ email });
@@ -165,7 +165,7 @@ router.put('/resetpasswordbyotp', async(req,res,next)=>{
         user.password = newPassword;
         user.otp = undefined;
         await user.save();
-    
+
         res.json(createResponse(true, 'Password reset successfully'));
     } catch (error) {
         next(error)
@@ -193,7 +193,7 @@ router.put('/changepassword', authTokenHandler, async (req, res, next) => {
 
         // If user doesn't exist
         if (!user) {
-            return res.status(404).json(createResponse(true,"User not Found"));
+            return res.status(404).json(createResponse(true, "User not Found"));
         }
 
         // Compare oldPassword with the existing password
@@ -249,42 +249,43 @@ router.delete('/deleteuser', authTokenHandler, async (req, res, next) => {
         const user = await User.findByIdAndDelete(userId);
 
         if (!user) {
-            return res.status(404).json(createResponse(false,'User not found'));
+            return res.status(404).json(createResponse(false, 'User not found'));
         }
 
-        return res.status(200).json(createResponse(true,'User account deleted successfully' ));
+        return res.status(200).json(createResponse(true, 'User account deleted successfully'));
     } catch (error) {
         console.error(error);
-        return res.status(500).json(createResponse(false,'Internal server error'));
+        return res.status(500).json(createResponse(false, 'Internal server error'));
     }
 });
-router.put('/uploadImage', authTokenHandler, async (req, res) => {
+router.put('/uploadImage', authTokenHandler, async (req, res, next) => {
     try {
-        const userId = req.userId; // Extracting userId from middleware
 
+        const userId = req.userId; // Extracting userId from middleware
         // Find the user by userId
         const user = await User.findById(userId);
 
         // If user doesn't exist
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json(createResponse(false, "User not Found"));
         }
 
-        // Extract the link from the request body
-        const { link } = req.body;
+        const { link, publicId } = req.body;
 
-        // Update the userImageURL field
+        if (!link) {
+            return res.status(500).json(createResponse(false, "Link is undefined"))
+        }
+
         user.userImageURL = link;
-
-        // Save the updated user
+        user.userImagePublicId = publicId;
         await user.save();
 
         // Respond with success message
-        res.status(200).json({ message: 'User image URL updated successfully' });
+        res.status(200).json(createResponse(true, 'User image URL updated successfully', user.userImageURL));
     } catch (error) {
         // Handle errors
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json(createResponse(true, 'Internal server error'));
     }
 });
 router.post('/getuserdata', authTokenHandler, async (req, res, next) => {
@@ -304,7 +305,9 @@ router.post('/getuserdata', authTokenHandler, async (req, res, next) => {
         dob: user.dob,
         goal: user.goal,
         workouts: user.workouts,
-        activityLevel: user.activityLevel
+        activityLevel: user.activityLevel,
+        profilePicture: user.userImageURL,
+        profilePublicId: user.userImagePublicId
     }
 
     res.json(createResponse(true, 'UserDetails fetched successfully', userDetails))

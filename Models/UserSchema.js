@@ -26,6 +26,9 @@ const userSchema = new mongoose.Schema({
     userImageURL: {
         type: String,
     },
+    userImagePublicId: {
+        type: String,
+    },
     weight: [
         {
             weight: {

@@ -18,6 +18,8 @@ const upload = multer({ storage });
 
 router.post('/uploadimage', upload.single('myimage'), async (req, res) => {
     const file = req.file;
+    const folderName = req.body.folderName; // Get folder name from request body
+
     if (!file) {
         return res.status(400).json({ ok: false, error: 'No image file provided' });
     }
@@ -30,14 +32,31 @@ router.post('/uploadimage', upload.single('myimage'), async (req, res) => {
                 return res.status(500).json({ ok: false, error: 'Error processing image' });
             }
 
-            cloudinary.uploader.upload_stream({ resource_type: 'auto' }, async (error, result) => {
+            cloudinary.uploader.upload_stream({ resource_type: 'auto', folder: folderName }, async (error, result) => {
                 if (error) {
                     console.error('Cloudinary Upload Error:', error);
                     return res.status(500).json({ ok: false, error: 'Error uploading image to Cloudinary' });
                 }
 
-                res.json({ ok: true, imageUrl: result.url, message: 'Image uploaded successfully' });
+                res.json({ ok: true, imageUrl: result.url, imageId: result.public_id, message: 'Image uploaded successfully' });
             }).end(data);
         })
 });
+
+router.delete('/deletecloudinaryimages', async (req, res) => {
+  try {
+    const { publicId } = req.body; // Assuming an array of public IDs is sent in the request body
+
+    // Delete resources using public IDs
+    const result = await cloudinary.uploader.destroy(publicId, { resource_type: 'image' })
+
+
+    res.json({ok:true, message: 'Images deleted successfully' ,data:result, id:publicId});
+  } catch (error) {
+    console.error("Error deleting images:", error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 module.exports = router;
