@@ -61,7 +61,7 @@ router.post('/login', async (req, res, next) => {
 
         // Generate an authentication token for the admin
 
-        const adminAuthToken = jwt.sign({ adminId: admin._id }, process.env.JWT_ADMIN_SECRET_KEY, { expiresIn: '10m' });
+        const adminAuthToken = jwt.sign({ adminId: admin._id }, process.env.JWT_ADMIN_SECRET_KEY, { expiresIn: '30m' });
         
         res.cookie('adminAuthToken', adminAuthToken, { httpOnly: true });
         res.status(200).json(createResponse(true, 'Admin login successful', { adminAuthToken }));
@@ -78,6 +78,16 @@ router.get('/checklogin', adminTokenHandler, async (req, res) => {
         ok: true,
         message: 'Admin authenticated successfully'
     })
+})
+
+router.post('/logout',adminTokenHandler, async(req,res,next)=>{try {
+    
+        res.clearCookie('adminAuthToken');
+    
+        res.status(200).json({ message: 'Logout successful', ok: true });
+} catch (error) {
+    next(error)
+}
 })
 
 
