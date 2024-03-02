@@ -113,7 +113,7 @@ router.put('/workouts/:id', adminTokenHandler, async (req, res) => {
 router.delete('/workouts/:id', adminTokenHandler, async (req, res) => {
     try {
         const workout = await Workout.findById(req.params.id);
-        await workout.remove();
+        await workout.deleteOne();
         res.json(createResponse(true, 'Workout deleted successfully'));
     } catch (err) {
         res.json(createResponse(false, err.message));
