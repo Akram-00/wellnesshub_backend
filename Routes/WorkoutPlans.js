@@ -17,48 +17,6 @@ function createResponse(ok, message, data) {
 
 router.post('/workouts', adminTokenHandler, async (req, res) => {
     try {
-        // name: {
-        //     type: String,
-        //     required: true,
-        // },
-        // description: {
-        //     type: String,
-        //     required: true,
-        // },
-        // durationInMinutes: {
-        //     type: Number,
-        //     required: true,
-        // },
-        // exercises: [
-        //     {
-        //         name: {
-        //             type: String,
-        //             required: true,
-        //         },
-        //         description: {
-        //             type: String,
-        //             required: true,
-        //         },
-        //         sets: {
-        //             type: Number,
-        //             required: true,
-        //         },
-        //         reps: {
-        //             type: Number,
-        //             required: true,
-        //         },
-        //         imageURL: {
-        //             type: String,
-        //             required: true,
-        //         },
-        //     }
-        // ],
-        // imageURL: {
-        //     type: String,
-        //     required: true,
-        // },
-
-
         const { name, description, durationInMinutes, exercises, imageURL } = req.body;
         const workout = new Workout({
             name,

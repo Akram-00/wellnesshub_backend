@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Admin = require('../Models/AdminSchema'); // Import the Admin model
+const Users = require('../Models/UserSchema')
 const bcrypt = require('bcrypt');
 const errorHandler = require('../Middlewares/errorMiddleware');
 const adminTokenHandler = require('../Middlewares/checkAdminToken');
@@ -62,7 +63,7 @@ router.post('/login', async (req, res, next) => {
         // Generate an authentication token for the admin
 
         const adminAuthToken = jwt.sign({ adminId: admin._id }, process.env.JWT_ADMIN_SECRET_KEY, { expiresIn: '30m' });
-        
+
         res.cookie('adminAuthToken', adminAuthToken, { httpOnly: true });
         res.status(200).json(createResponse(true, 'Admin login successful', { adminAuthToken }));
     } catch (err) {
@@ -70,7 +71,20 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-
+router.get('/userData', adminTokenHandler, async (req, res) => {
+    try {
+        const users = await Users.find({});
+        const data = users.map((user) => {
+            const { name, email, dob, _id } = user
+            return {
+                name, email, dob, _id
+            }
+        })
+        res.json(createResponse(true, "User Data Fetched Successfully", data))
+    } catch (err) {
+        res.json(createResponse(false, err.message))
+    }
+})
 
 router.get('/checklogin', adminTokenHandler, async (req, res) => {
     res.json({
@@ -80,14 +94,13 @@ router.get('/checklogin', adminTokenHandler, async (req, res) => {
     })
 })
 
-router.post('/logout',adminTokenHandler, async(req,res,next)=>{try {
-    
+router.post('/logout', adminTokenHandler, async (req, res, next) => {
+    try {
         res.clearCookie('adminAuthToken');
-    
         res.status(200).json({ message: 'Logout successful', ok: true });
-} catch (error) {
-    next(error)
-}
+    } catch (error) {
+        next(error)
+    }
 })
 
 
