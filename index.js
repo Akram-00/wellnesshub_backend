@@ -23,20 +23,22 @@ require('dotenv').config();
 require('./db');
 
 app.use(bodyParser.json());
-const allowedOrigins = ['http://localhost:3000']; // front-end url
+const allowedOrigins = ['https://miniature-system-rqvr57797vw2pw9j-3000.app.github.dev']; // front-end url
 // cors policy only allows those who only have accesss
-app.use(
-    cors({
-        origin: function (origin, callback) {
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true)
-            } else {
-                callback(new Error("Not allowed by CORS"))
-            }
-        },
-        credentials: true,// allow crendentials  
-    })
-)
+
+const allowedOrigin = 'https://miniature-system-rqvr57797vw2pw9j.github.dev';
+
+app.use(cors({
+    origin: function (origin, callback) {
+      // Check if the request origin matches the allowed origin or if the origin is not present (for same-origin requests)
+      if (!origin || origin === 'https://miniature-system-rqvr57797vw2pw9j-3000.app.github.dev') {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true
+  }));
 
 // storing your cookies
 app.use(cookieParser());
