@@ -23,13 +23,12 @@ require('dotenv').config();
 require('./db');
 
 app.use(bodyParser.json());
-const allowedOrigins = ['https://miniature-system-rqvr57797vw2pw9j-3000.app.github.dev']; // front-end url
 // cors policy only allows those who only have accesss
 
   app.use(cors({
     origin: [
-        'https://supreme-enigma-v97gjpp46vrfx56x-3000.app.github.dev',
-        'https://miniature-system-rqvr57797vw2pw9j-3000.app.github.dev'
+        'https://supreme-enigma-v97gjpp46vrfx56x-3000.app.github.dev',//admin
+        'https://miniature-system-rqvr57797vw2pw9j-3000.app.github.dev'// user
     ],
     credentials: true
 }));
