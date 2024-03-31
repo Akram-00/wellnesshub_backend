@@ -26,19 +26,14 @@ app.use(bodyParser.json());
 const allowedOrigins = ['https://miniature-system-rqvr57797vw2pw9j-3000.app.github.dev']; // front-end url
 // cors policy only allows those who only have accesss
 
-const allowedOrigin = 'https://miniature-system-rqvr57797vw2pw9j.github.dev';
-
-app.use(cors({
-    origin: function (origin, callback) {
-      // Check if the request origin matches the allowed origin or if the origin is not present (for same-origin requests)
-      if (!origin || origin === 'https://miniature-system-rqvr57797vw2pw9j-3000.app.github.dev') {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+  app.use(cors({
+    origin: [
+        'https://supreme-enigma-v97gjpp46vrfx56x-3000.app.github.dev',
+        'https://miniature-system-rqvr57797vw2pw9j-3000.app.github.dev'
+    ],
     credentials: true
-  }));
+}));
+
 
 // storing your cookies
 app.use(cookieParser());
