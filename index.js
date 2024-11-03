@@ -25,13 +25,28 @@ require('./db');
 app.use(bodyParser.json());
 // cors policy only allows those who only have accesss
 
-app.use(cors({
-    origin: [
-        'https://wellnesshub-frontend.vercel.app/',
+const allowedOrigins = [
+    'https://wellnesshub-frontend.vercel.app',
+];
 
-    ],
-    credentials: true
-}));
+
+// CORS Options
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.error(`Blocked by CORS: ${origin}`);
+            callback(new Error(`Not allowed by CORS: ${origin}`));
+        }
+    },
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+// CORS Middleware
+app.use(cors(corsOptions));
 
 
 // storing your cookies
