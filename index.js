@@ -25,10 +25,10 @@ require('./db');
 app.use(bodyParser.json());
 // cors policy only allows those who only have accesss
 
-  app.use(cors({
+app.use(cors({
     origin: [
-        'https://supreme-enigma-v97gjpp46vrfx56x-3000.app.github.dev',//admin
-        'https://miniature-system-rqvr57797vw2pw9j-3000.app.github.dev'// user
+        'https://wellnesshub-frontend.vercel.app/',
+
     ],
     credentials: true
 }));
