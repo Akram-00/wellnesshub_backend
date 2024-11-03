@@ -41,6 +41,7 @@ const corsOptions = {
             callback(new Error(`Not allowed by CORS: ${origin}`));
         }
     },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
     optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 };
