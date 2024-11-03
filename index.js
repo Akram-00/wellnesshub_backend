@@ -25,7 +25,7 @@ require('./db');
 app.use(bodyParser.json());
 // cors policy only allows those who only have accesss
 
-const allowedOrigins = ['http://localhost:3000'];
+const allowedOrigins = ['https://wellnesshub-frontend.vercel.app'];
 
 // CORS Options
 const corsOptions = {
