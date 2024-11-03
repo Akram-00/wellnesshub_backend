@@ -25,10 +25,7 @@ require('./db');
 app.use(bodyParser.json());
 // cors policy only allows those who only have accesss
 
-const allowedOrigins = [
-    'https://wellnesshub-frontend.vercel.app',
-];
-
+const allowedOrigins = ['https://wellnesshub-frontend.vercel.app'];
 
 // CORS Options
 const corsOptions = {
@@ -42,21 +39,24 @@ const corsOptions = {
         }
     },
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-    optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200 // For legacy browsers
 };
 
-// CORS Middleware
+// Use CORS Middleware
 app.use(cors(corsOptions));
 
+// Custom Middleware for Additional CORS Headers
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://wellnesshub-frontend.vercel.app'); // Allow requests from your frontend
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Allow specific HTTP methods
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Allow specific headers
-    res.header('Access-Control-Allow-Credentials', 'true'); // Important if you're using cookies or authentication
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
+        return res.sendStatus(200);
+    }
+
     next();
 });
-
-
 
 // storing your cookies
 app.use(cookieParser());
